@@ -380,7 +380,8 @@ nameserver 192.194.2.3' > /etc/resolv.conf
 ping operation.wise.E04.com -c 5
 ```
 
-![soal6](https://user-images.githubusercontent.com/65794806/139521039-0ec050f5-7fa7-4b9b-838d-35994e37ca79.png)
+![gamber 5 1](https://user-images.githubusercontent.com/81162174/198837277-a6090aa1-7f2a-4786-8116-72b0e761df57.PNG)
+![gambar 5 2](https://user-images.githubusercontent.com/81162174/198837356-ebc614c6-12cb-41c6-ad25-d58499674b6d.PNG)
 
 ## 7
 
@@ -415,8 +416,8 @@ Pada `SSS`
 ping strix.operation.wise.E04.com -c 5
 ```
 
-
-![soal7](https://user-images.githubusercontent.com/65794806/139521280-b16ba373-2efb-4c3e-ac08-8f05f8d9594a.png)
+![gamber 71](https://user-images.githubusercontent.com/81162174/198837565-e3076624-8b4b-4e26-a09e-bffea1c96fe0.PNG)
+![gambar 72](https://user-images.githubusercontent.com/81162174/198837570-78a2bb65-22f0-462c-a7f2-10441f56e8b1.PNG)
 
 ## Soal 8
 
