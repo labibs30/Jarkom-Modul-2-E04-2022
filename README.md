@@ -224,7 +224,7 @@ lynx wise.E04.com
 Maka akan muncul seperti ini:
 
 ## Soal 9
-> Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`
+> Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`. Untuk itu dilakukan command seperti berikut:
 1. `Eden`
 ```
 a2enmod rewrite
@@ -260,5 +260,43 @@ service apache2 restart
 2. `SSS`
 ```
 lynx www.wise.E04.com/home
+```
+Maka akan muncul seperti ini:
+
+## Soal 10
+> Setelah itu, pada subdomain `www.eden.wise.E04.com`, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada `/var/www/eden.wise.E04.com`. Untuk itu dilakukan command seperti berikut:
+1. `Eden`
+```
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+echo '
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.E04.com
+        ServerName eden.wise.E04.com
+        ServerAlias www.eden.wise.E04.com
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+' > /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+mkdir /var/www/eden.wise.E04.com
+
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1q9g6nM85bW5T9f5yoyXtDqonUKKCHOTV' -O /var/www/eden.wise.zip
+
+unzip /var/www/eden.wise.zip -d /var/www
+
+cp /var/www/eden.wise/* /var/www/eden.wise.E04.com
+
+a2ensite eden.wise.E04.com
+
+service apache2 restart
+
+service apache2 reload
+```
+2. `SSS`
+```
+www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
