@@ -283,7 +283,7 @@ Setelah dijalankan, maka akan diperoleh :
 
 
 pada `Wise`
-```
+```shell
 echo ';
 ; BIND data file for local loopback interface
 ;
@@ -304,7 +304,8 @@ ns1     IN      A       192.194.2.3     ; IP Eden
 operation       IN      NS      ns1
 @       IN      AAAA    ::1' > /etc/bind/wise/wise.E04.com
 
-```echo 'options {
+```shell
+echo 'options {
         directory "/var/cache/bind";
 
         allow-query{any;};
@@ -329,7 +330,8 @@ service bind9 restart
 
 Pada `Berlint`
 
-```echo 'options {
+```shell
+echo 'options {
         directory "/var/cache/bind";
 
         allow-query{any;};
@@ -371,7 +373,7 @@ www             IN      CNAME   operation.wise.E04.com.' > /etc/bind/operation/o
 service bind9 restart
 ```
 Pada `SSS`
-```
+```shell
 echo 'nameserver 192.194.3.2
 nameserver 192.194.2.2
 nameserver 192.194.2.3' > /etc/resolv.conf
@@ -393,7 +395,8 @@ Pada `SSS`
 
 Pada `Berlint`
 
-```echo ';
+```shell
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
@@ -415,7 +418,7 @@ service bind9 restart
 ```
 
 Pada `SSS`
-```
+```shell
 ping strix.operation.wise.E04.com -c 5
 ```
 Pada `Berlint`
@@ -429,7 +432,7 @@ Pada `SSS`
 
 > Diperlukan konfigurasi Webserver `www.wise.E04.com` dengan DocumentRoot pada `/var/www/wise.E04.com`. Untuk itu dilakukan command seperti berikut:
 1. Di node `Wise`
-```
+```shell
 cp /etc/bind/wise/3.194.192.in-addr.arpa /etc/bind/wise/2.194.192.in-addr.arpa
 
 echo ';
@@ -482,7 +485,7 @@ operation       IN      NS      ns1
 service bind9 restart
 ```
 2. Di node `Eden`
-```
+```shell
 apt-get update
 
 apt-get install apache2
@@ -527,7 +530,7 @@ service apache2 reload
 ```
 
 3. Di node `SSS`
-```
+```shell
 apt-get update
 
 apt-get install lynx
@@ -543,7 +546,7 @@ Maka akan muncul seperti ini:
 ## Soal 9
 > Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`. Untuk itu dilakukan command seperti berikut:
 1. Di node `Eden`
-```
+```shell
 a2enmod rewrite
 
 service apache2 restart
@@ -575,7 +578,7 @@ echo "
 service apache2 restart
 ```
 2. Di node `SSS`
-```
+```shell
 lynx www.wise.E04.com/home
 ```
 Maka akan muncul seperti ini:
@@ -586,7 +589,7 @@ Maka akan muncul seperti ini:
 ## Soal 10
 > Setelah itu, pada subdomain `www.eden.wise.E04.com`, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada `/var/www/eden.wise.E04.com`. Untuk itu dilakukan command seperti berikut:
 1. Di node `Eden`
-```
+```shell
 cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/eden.wise.E04.com.conf
 
 echo '
@@ -616,7 +619,7 @@ service apache2 restart
 service apache2 reload
 ```
 2. Di node `SSS`
-```
+```shell
 lynx www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
@@ -627,7 +630,7 @@ Maka akan muncul seperti ini:
 ## Soal 11
 > Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja. Untuk itu dilakukan command seperti berikut:
 1. Di node `Eden`
-```
+```shell
 echo "
 <VirtualHost *:80>
         ServerAdmin webmaster@localhost
@@ -652,7 +655,7 @@ echo "
 service apache2 restart
 ```
 2. Di node `SSS`
-```
+```shell
 lynx www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
