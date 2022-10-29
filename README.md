@@ -379,8 +379,11 @@ nameserver 192.194.2.3' > /etc/resolv.conf
 
 ping operation.wise.E04.com -c 5
 ```
-
+Pada `Wise`
 ![gamber 5 1](https://user-images.githubusercontent.com/81162174/198837277-a6090aa1-7f2a-4786-8116-72b0e761df57.PNG)
+Pada `Berlint`
+![gambar 63](https://user-images.githubusercontent.com/81162174/198837649-ce4902ba-9b08-41e1-8f3a-0d18659d8836.PNG)
+Pada `SSS`
 ![gambar 5 2](https://user-images.githubusercontent.com/81162174/198837356-ebc614c6-12cb-41c6-ad25-d58499674b6d.PNG)
 
 ## 7
