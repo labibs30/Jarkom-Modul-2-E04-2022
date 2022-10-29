@@ -24,7 +24,7 @@
 16. [Soal 16](https://github.com/labibs30/Jarkom-Modul-2-E04-2022.git#16)
 17. [Soal 17](https://github.com/labibs30/Jarkom-Modul-2-E04-2022.git#17)
 
-## 1
+## Nomor 1
 
 > Membuat topologi seperti gambar dibawah : 
 
@@ -98,7 +98,7 @@ iface eth0 inet static
 
 Kemudian, meletakkan `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.194.0.0/16` pada `/root/.bashrc` pada **Ostania**. Terakhir, tambahkan `echo nameserver 192.168.122.1` untuk setiap node pada `/root/.bashrc`.
 
-## 2
+## Nomor 2
 > Membuat webiste utama dengan menggunakan `wise.E04.com` dengan alias `www.wise.E04.com` pada folder wise. Untuk melakukan hal tersebut, digunakan perintah seperti berikut : 
 1. `WISE`
 
@@ -147,7 +147,7 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 
 ![image](https://user-images.githubusercontent.com/96496752/198818465-cfe5d52e-2736-4832-a18f-a849205bdcc1.png)
 
-## 3
+## Nomor 3
 > Membuat subdomain `eden.wise.yyy.com` dengan alias `www.eden.wise.yyy.com` yang diatur DNS-nya di **WISE** dan mengarah ke **Eden**
 
 Pada `WISE` kita cukup menambahkan `eden`
@@ -177,7 +177,7 @@ Selanjutnya, menjalankan `ping eden.wise.yyy.com` dan `ping www.eden.wise.yyy.co
 
 ![image](https://user-images.githubusercontent.com/96496752/198831311-848bc2b9-0fb1-4f3d-9205-2a8e60659f65.png)
 
-## 4
+## Nomor 4
 
 > Membuat juga reverse domain untuk domain utama.
 
@@ -228,7 +228,7 @@ Untuk test bisa menggunakan `host -t PTR 192.194.3.2` pada client, berikut hasil
 
 ![image](https://user-images.githubusercontent.com/96496752/198832131-c8ed524d-e44e-4c09-9cdf-a8442a7bd245.png)
 
-## 5
+## Nomor 5
 
 > Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama
 
@@ -277,103 +277,144 @@ ping wise.E04.com -c 5
 Setelah dijalankan, maka akan diperoleh : 
 ![image](https://user-images.githubusercontent.com/96496752/198834430-b953cd61-0fec-44ef-a9d2-ebb087606253.png)
 
-## 6
+## Nomor 6
 
-> Setelah itu terdapat subdomain mecha.franky.yyy.com dengan alias www.mecha.franky.yyy.com yang didelegasikan dari EniesLobby ke Water7 dengan IP menuju ke Skypie dalam folder sunnygo.
+> Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation
 
-Pada soal ini melakukan delegasi domain.
 
-**Enieslobby /etc/bind/kaizoku/franky.e01.com.**
-```shell
-;
+pada `Wise`
+```
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                     2021100401         ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.2
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-mecha   IN      NS      ns1
+@       IN      NS      wise.E04.com.
+@       IN      A       192.194.3.2     ; IP Wise
+www     IN      CNAME   wise.E04.com.
+eden    IN      A       192.194.2.3     ; IP Eden
+www.eden     IN      CNAME   eden.wise.E04.com.
+ns1     IN      A       192.194.2.3     ; IP Eden
+operation       IN      NS      ns1
+@       IN      AAAA    ::1' > /etc/bind/wise/wise.E04.com
+
+```echo 'options {
+        directory "/var/cache/bind";
+
+        allow-query{any;};
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};' > /etc/bind/named.conf.options
+
+echo 'zone "wise.E04.com" {
+        type master;
+        file "/etc/bind/wise/wise.E04.com";
+        allow-transfer { 192.194.2.2; }; // Masukan IP Eden tanpa tanda petik
+};
+
+zone "3.194.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/wise/3.194.192.in-addr.arpa";
+};' > /etc/bind/named.conf.local
+
+service bind9 restart
 ```
-Kemudian, melakukan pengeditan pada named.conf.options dnnsec, dan menambahkan allow-query{any;};
+
+Pada `Berlint`
 
 **Water7 /etc/bind/named.conf.local**
-```shell
-// SLAVE
-zone "franky.e01.com" {
-    type slave;
-    masters { 192.200.2.2; }; // Masukan IP EniesLobby tanpa tanda petik
-    file "/var/lib/bind/franky.e01.com";
+```echo 'options {
+        directory "/var/cache/bind";
+
+        allow-query{any;};
+
+        auth-nxdomain no;    # conform to RFC1035
+        listen-on-v6 { any; };
+};' > /etc/bind/named.conf.options
+
+echo 'zone "wise.E04.com" {
+        type slave;
+        masters { 192.194.3.2; }; // Masukan IP Wise tanpa tanda petik
+        file "/var/lib/bind/wise.E04.com";
 };
 
-// DELEGASI
-zone "mecha.franky.e01.com" {
-    type master;
-    file "/etc/bind/sunnygo/mecha.franky.e01.com"
-};
-```
-Edit named.conf.options dnnsec dan menambahkan allow-query{any;};. Selain itu Delegasi juga ditambahkan.
+zone "operation.wise.E04.com"{
+        type master;
+        file "/etc/bind/operation/operation.wise.E04.com";
+};' > /etc/bind/named.conf.local
 
-**Water7 /etc/bind/sunnygo/mecha.franky.e01.com**
-```shell
-;
+mkdir /etc/bind/operation
+
+cp /etc/bind/db.local /etc/bind/operation/operation.wise.E04.com
+
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     mecha.franky.e01.com. root.mecha.franky.e01.com. (
-                              2021100401                ; Serial
+@       IN      SOA     operation.wise.E04.com. root.operation.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      mecha.franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   mecha.franky.e01.com.
-```
-Menambahkan Aliasnya.
+@               IN      NS      operation.wise.E04.com.
+@               IN      A       192.194.2.3       ;ip Eden
+www             IN      CNAME   operation.wise.E04.com.' > /etc/bind/operation/operation.wise.E04.com
 
-`ping mecha.franky.e01.com`
-`ping www.mecha.franky.e01.com  `
+service bind9 restart
+```
+Pada `SSS`
+```
+echo 'nameserver 192.194.3.2
+nameserver 192.194.2.2
+nameserver 192.194.2.3' > /etc/resolv.conf
+
+ping operation.wise.E04.com -c 5
+```
 
 ![soal6](https://user-images.githubusercontent.com/65794806/139521039-0ec050f5-7fa7-4b9b-838d-35994e37ca79.png)
 
 ## 7
 
-> Untuk memperlancar komunikasi Luffy dan rekannya, dibuatkan subdomain melalui Franky dengan nama general.mecha.frank.yyy.com dengan alias www.general.mecha.franky.yyy.com yang mengarah ke Skypie.
+> Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden.
 
-Membuat sub-domain kemudian menambahkan `alias general.mecha.franky.e01.com.`.
 
-**Water7 /etc/bind/sunnygo/mecha.franky.e01.com**
-```shell
-;
+Pada `Berlint`
+
+```echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     mecha.franky.e01.com. root.mecha.franky.e01.com. (
-                              2021100401                ; Serial
+@       IN      SOA     operation.wise.E04.com. root.operation.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      mecha.franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   mecha.franky.e01.com.
-general IN      A       192.200.2.4
-www.general IN  CNAME   general.mecha.franky.e01.com.
+@               IN      NS      operation.wise.E04.com.
+@               IN      A       192.194.2.3       ;ip Eden
+www	          IN	CNAME	operation.wise.E04.com.
+strix	          IN	A	192.194.2.3
+www.strix	    IN	A	192.194.2.3' > /etc/bind/operation/operation.wise.E04.com
+
+service bind9 restart
+
 ```
 
-`ping general.mecha.franky.e01.com`
-`ping www.general.mecha.franky.e01.com`
+Pada `SSS`
+```
+ping strix.operation.wise.E04.com -c 5
+```
+
 
 ![soal7](https://user-images.githubusercontent.com/65794806/139521280-b16ba373-2efb-4c3e-ac08-8f05f8d9594a.png)
 
