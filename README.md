@@ -1,7 +1,7 @@
 # Jarkom-Modul-2-E04-2022
 
 - Muhammad Afif Dwi Ardiansyah 5025201212
-- Muhammad Rafif Fadhil Naufal 5025201
+- Muhammad Rafif Fadhil Naufal 5025201273
 - M Labib Alfaraby 5025201083
 
 ### List
