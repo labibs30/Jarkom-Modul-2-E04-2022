@@ -419,7 +419,9 @@ ping strix.operation.wise.E04.com -c 5
 ```
 Pada `Berlint`
 ![gamber 71](https://user-images.githubusercontent.com/81162174/198837565-e3076624-8b4b-4e26-a09e-bffea1c96fe0.PNG)
+
 Pada `SSS`
+
 ![gambar 72](https://user-images.githubusercontent.com/81162174/198837570-78a2bb65-22f0-462c-a7f2-10441f56e8b1.PNG)
 
 ## Soal 8
