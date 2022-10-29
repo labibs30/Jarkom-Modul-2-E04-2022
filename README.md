@@ -111,354 +111,113 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 
 ![image](https://user-images.githubusercontent.com/96496752/198818465-cfe5d52e-2736-4832-a18f-a849205bdcc1.png)
 
-## 3
-
-> Setelah itu buat subdomain super.franky.yyy.com dengan alias www.super.franky.yyy.com yang diatur DNS nya di EniesLobby dan mengarah ke Skypie.
-
-Pada franky kita cukup menambahkan super.
-
-**EniesLobby modul1/franky.e01.com**
-```shell
-;
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                     2021100401         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.2
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-```
-Kemudian menjalankan `ping super.franky.e01.com` dan `ping www.super.franky.e01.com` pada 2 line paling bawah. Hasilnya sebagai berikut.
-
-![soal3](https://user-images.githubusercontent.com/65794806/139520648-e5e6b609-2937-43e9-831e-c7785aaa0d67.png)
-
-## 4
-
-> Buat juga reverse domain untuk domain utama.
-
-Karena pada nomor 2 telah dideclare di named.conf.local, maka tinggal menambahkan config addr arpanya.
-
-**EniesLobby modul1/2.200.192.in-addr.arpa**
-```shell
-;
-; BIND data file for local loopback interface
-;
-$TTL	604800
-@	IN	SOA	franky.e01.com. root.franky.e01.com. (
-			2021100401	; Serial
-			 604800		; Refresh
-			  86400		; Retry
-			2419200		; Expire
-			 604800 )	; Negative Cache TTL
-;
-2.200.192.in-addr.arpa. IN	NS	franky.e01.com.
-2 			IN	PTR	franky.e01.com.
-
-```
-`cp modul1/2.200.192.in-addr.arpa /etc/bind/kaizoku/2.200.192.in-addr.arpa`
-
-Cek: `host -t PTR 192.200.2.2`
-
-![soal4](https://user-images.githubusercontent.com/65794806/139520789-af2d3fd3-6382-4c72-b9e6-193fa285b511.png)
-
-## 5
-
-> Supaya tetap bisa menghubungi Franky jika server EniesLobby rusak, maka buat Water7 sebagai DNS Slave untuk domain utama.
-
-Menambahkan Notify
-
-**EniesLobby /etc/bind/named.conf.local**
-```shell
-zone "franky.e01.com" {
-    type master;
-    file "/etc/bind/kaizoku/franky.e01.com";
-    allow-transfer { 192.200.2.3; }; // Masukan IP Water7 tanpa tanda petik
-    // bikin jadi slave
-    also-notify { 192.200.2.3; };
-    notify yes;
-};
-
-zone "2.200.192.in-addr.arpa" {
-    type master;
-    file "/etc/bind/kaizoku/2.200.192.in-addr.arpa";
-};
-```
-Menyalakan notify
-
-![soal5 1](https://user-images.githubusercontent.com/65794806/139520902-586295cf-99a4-4017-a2eb-6f0a738a8622.png)
-
-![soal5 2](https://user-images.githubusercontent.com/65794806/139520904-b9f09b19-3345-4402-a955-2d6446a65c04.png)
-
-## 6
-
-> Setelah itu terdapat subdomain mecha.franky.yyy.com dengan alias www.mecha.franky.yyy.com yang didelegasikan dari EniesLobby ke Water7 dengan IP menuju ke Skypie dalam folder sunnygo.
-
-Pada soal ini melakukan delegasi domain.
-
-**Enieslobby /etc/bind/kaizoku/franky.e01.com.**
-```shell
-;
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                     2021100401         ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.2
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-mecha   IN      NS      ns1
-```
-Kemudian, melakukan pengeditan pada named.conf.options dnnsec, dan menambahkan allow-query{any;};
-
-**Water7 /etc/bind/named.conf.local**
-```shell
-// SLAVE
-zone "franky.e01.com" {
-    type slave;
-    masters { 192.200.2.2; }; // Masukan IP EniesLobby tanpa tanda petik
-    file "/var/lib/bind/franky.e01.com";
-};
-
-// DELEGASI
-zone "mecha.franky.e01.com" {
-    type master;
-    file "/etc/bind/sunnygo/mecha.franky.e01.com"
-};
-```
-Edit named.conf.options dnnsec dan menambahkan allow-query{any;};. Selain itu Delegasi juga ditambahkan.
-
-**Water7 /etc/bind/sunnygo/mecha.franky.e01.com**
-```shell
-;
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     mecha.franky.e01.com. root.mecha.franky.e01.com. (
-                              2021100401                ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      mecha.franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   mecha.franky.e01.com.
-```
-Menambahkan Aliasnya.
-
-`ping mecha.franky.e01.com`
-`ping www.mecha.franky.e01.com  `
-
-![soal6](https://user-images.githubusercontent.com/65794806/139521039-0ec050f5-7fa7-4b9b-838d-35994e37ca79.png)
-
-## 7
-
-> Untuk memperlancar komunikasi Luffy dan rekannya, dibuatkan subdomain melalui Franky dengan nama general.mecha.frank.yyy.com dengan alias www.general.mecha.franky.yyy.com yang mengarah ke Skypie.
-
-Membuat sub-domain kemudian menambahkan `alias general.mecha.franky.e01.com.`.
-
-**Water7 /etc/bind/sunnygo/mecha.franky.e01.com**
-```shell
-;
-; BIND data file for local loopback interface
-;
-$TTL    604800
-@       IN      SOA     mecha.franky.e01.com. root.mecha.franky.e01.com. (
-                              2021100401                ; Serial
-                         604800         ; Refresh
-                          86400         ; Retry
-                        2419200         ; Expire
-                         604800 )       ; Negative Cache TTL
-;
-@       IN      NS      mecha.franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   mecha.franky.e01.com.
-general IN      A       192.200.2.4
-www.general IN  CNAME   general.mecha.franky.e01.com.
-```
-
-`ping general.mecha.franky.e01.com`
-`ping www.general.mecha.franky.e01.com`
-
-![soal7](https://user-images.githubusercontent.com/65794806/139521280-b16ba373-2efb-4c3e-ac08-8f05f8d9594a.png)
-
 ## 8
 
-> Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com
+> Diperlukan konfigurasi Webserver www.wise.yyy.com dengan DocumentRoot pada /var/www/wise.yyy.com. Untuk itu dilakukan command seperti berikut:
+1. `Wise`
+```
+cp /etc/bind/wise/3.194.192.in-addr.arpa /etc/bind/wise/2.194.192.in-addr.arpa
 
-Karena menggunakan web server, maka Config EniesLobby terlebih dahulu diarahkan ke Skypie.
-
-**EniesLobby modul1/webserver/franky.e01.com**
-```shell
-;
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                        4               ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-mecha   IN      NS      ns1
-```
+2.194.192.in-addr.arpa.       IN      NS      wise.E04.com.
+3       IN      PTR      wise.E04.com.' > /etc/bind/wise/2.194.192.in-addr.arpa
 
-**EniesLobby modul1/webserver/2.200.192.in-addr-arpa**
-```shell
-;
+
+echo 'zone "wise.E04.com" {
+    type master;
+    file "/etc/bind/wise/wise.E04.com";
+    allow-transfer { 192.194.2.2; }; // Masukan IP Berlint tanpa tanda petik
+};
+
+zone "2.194.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/wise/2.194.192.in-addr.arpa";
+};
+' > /etc/bind/named.conf.local
+
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                        2               ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-2.200.192.in-addr.arpa. IN      NS      franky.e01.com.
-2                       IN      PTR     franky.e01.com.
+@       IN      NS      wise.E04.com.
+@       IN      A       192.194.2.3
+www     IN      CNAME   wise.E04.com.
+eden    IN      A       192.194.2.3
+www.eden        IN      CNAME   eden.wise.E04.com.
+ns1     IN      A       192.194.2.3
+operation       IN      NS      ns1
+@       IN      AAAA    ::1' > /etc/bind/wise/wise.E04.com
+
+service bind9 restart
 ```
-
-Install apache2 & php di water7 dan memasukkan dokumen htmlnya.
-
-**Skypie modul1/franky.e01.com**
-```bash
-<VirtualHost *:80>
-  ...
-	ServerName franky.e01.com
-  ServerAlias www.franky.e01.com
-
-	ServerAdmin webmaster@localhost
-	DocumentRoot /var/www/franky.e01.com
-  
-  ...
-
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-  ...
-</VirtualHost>
-
+2. `Eden`
 ```
-`lynx http://www.franky.e01.com`
+apt-get update
 
-![soal8](https://user-images.githubusercontent.com/65794806/139521462-0b028254-894d-4d1b-9735-a03bf5e30126.png)
+apt-get install apache2
 
-## 9
+service apache2 start
 
-> Setelah itu, Luffy juga membutuhkan agar url www.franky.yyy.com/index.php/home dapat menjadi menjadi www.franky.yyy.com/home.
+apt-get install php
 
-Membuat alias dari home yang akan mengarah ke index.php/home
+apt-get install libapache2-mod-php7.0
 
-**Skypie modul1/franky.e01.com**
-```bash
+apt-get install wget -y
+
+apt-get install unzip -y
+
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/wise.E04.com.conf
+
+echo '
 <VirtualHost *:80>
-        ...
-        ServerName franky.e01.com
-        ServerAlias www.franky.e01.com
-
         ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/franky.e01.com
-
-        Alias "/home" "/var/www/franky.e01.com/index.php/home"
-
-        ...
+        DocumentRoot /var/www/wise.E04.com
+        ServerName wise.E04.com
+        ServerAlias www.wise.E04.com
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
         CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-        ...
 </VirtualHost>
+' > /etc/apache2/sites-available/wise.E04.com.conf
 
-```
-`lynx http://franky.e01.com/home`
+mkdir /var/www/wise.E04.com
 
-![soal9](https://user-images.githubusercontent.com/65794806/139521813-929fd2fe-c606-4c3c-84ad-8fbd43353eb9.png)
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1S0XhL9ViYN7TyCj2W66BNEXQD2AAAw2e' -O /var/www/wise.zip
 
-## 10
+unzip /var/www/wise.zip -d /var/www
 
-> Setelah itu, pada subdomain www.super.franky.yyy.com, Luffy membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/super.franky.yyy.com.
+cp /var/www/wise/* /var/www/wise.E04.com
 
-**Skypie /etc/apache2/sites-available/super.franky.e01.com.conf**
-```bash
-<VirtualHost *:80>
-        ...
-        ServerName super.franky.e01.com
-        ServerAlias www.super.franky.e01.com
+a2ensite wise.E04.com
 
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/super.franky.e01.com
+service apache2 restart
 
-        ...
-
-        ErrorLog ${APACHE_LOG_DIR}/error.log
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-        ...
-</VirtualHost>
+service apache2 reload
 ```
 
-cek lynx ke super.franky.e01.com
-`lynx http://www.super.franky.e01.com`
-
-![soal10](https://user-images.githubusercontent.com/65794806/139521940-61d24205-55e8-401f-983c-950d0b4161ae.png)
-
-Bentuknya berupa directory listing karena tidak ada default htmlnya.
-
-## 11
-
-> Akan tetapi, pada folder /public, Luffy ingin hanya dapat melakukan directory listing saja.
-
-Selanjutnya merupakan directory listing untuk public, dengan menambah directory dan option +indexes.
-
-**Skypie super.franky.e01.com.conf**
-```bash
-<VirtualHost *:80>
-        ServerName super.franky.e01.com
-        ServerAlias www.super.franky.e01.com
-
-        ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/super.franky.e01.com
-
-	<Directory /var/www/super.franky.e01.com>
-                Options +Indexes
-        </Directory>
-
-	<Directory /var/www/super.franky.e01.com/error>
-                Options -Indexes
-        </Directory>
-
-        <Directory /var/www/super.franky.e01.com/public>
-                Options +Indexes
-        </Directory>
-
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
+3. `SSS`
 ```
+apt-get update
 
-error dimatikan indexnya karena yang dibutuhkan pada public
+apt-get install lynx
 
-`lynx http://www.super.franky.e01.com/public`
+lynx wise.E04.com
 
+```
