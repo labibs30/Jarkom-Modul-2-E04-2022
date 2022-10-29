@@ -24,7 +24,7 @@
 16. [Soal 16](https://github.com/labibs30/Jarkom-Modul-2-E04-2022.git#16)
 17. [Soal 17](https://github.com/labibs30/Jarkom-Modul-2-E04-2022.git#17)
 
-## Nomor 1
+## Soal 1
 
 > Membuat topologi seperti gambar dibawah : 
 
@@ -98,7 +98,7 @@ iface eth0 inet static
 
 Kemudian, meletakkan `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.194.0.0/16` pada `/root/.bashrc` pada **Ostania**. Terakhir, tambahkan `echo nameserver 192.168.122.1` untuk setiap node pada `/root/.bashrc`.
 
-## Nomor 2
+## Soal 2
 > Membuat webiste utama dengan menggunakan `wise.E04.com` dengan alias `www.wise.E04.com` pada folder wise. Untuk melakukan hal tersebut, digunakan perintah seperti berikut : 
 1. `WISE`
 
@@ -147,7 +147,7 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 
 ![image](https://user-images.githubusercontent.com/96496752/198818465-cfe5d52e-2736-4832-a18f-a849205bdcc1.png)
 
-## Nomor 3
+## Soal 3
 > Membuat subdomain `eden.wise.yyy.com` dengan alias `www.eden.wise.yyy.com` yang diatur DNS-nya di **WISE** dan mengarah ke **Eden**
 
 Pada `WISE` kita cukup menambahkan `eden`
@@ -177,7 +177,7 @@ Selanjutnya, menjalankan `ping eden.wise.yyy.com` dan `ping www.eden.wise.yyy.co
 
 ![image](https://user-images.githubusercontent.com/96496752/198831311-848bc2b9-0fb1-4f3d-9205-2a8e60659f65.png)
 
-## Nomor 4
+## Soal 4
 
 > Membuat juga reverse domain untuk domain utama.
 
@@ -228,7 +228,7 @@ Untuk test bisa menggunakan `host -t PTR 192.194.3.2` pada client, berikut hasil
 
 ![image](https://user-images.githubusercontent.com/96496752/198832131-c8ed524d-e44e-4c09-9cdf-a8442a7bd245.png)
 
-## Nomor 5
+## Soal 5
 
 > Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama
 
@@ -277,7 +277,7 @@ ping wise.E04.com -c 5
 Setelah dijalankan, maka akan diperoleh : 
 ![image](https://user-images.githubusercontent.com/96496752/198834430-b953cd61-0fec-44ef-a9d2-ebb087606253.png)
 
-## Nomor 6
+## Soal 6
 
 > Karena banyak informasi dari Handler, buatlah subdomain yang khusus untuk operation yaitu operation.wise.yyy.com dengan alias www.operation.wise.yyy.com yang didelegasikan dari WISE ke Berlint dengan IP menuju ke Eden dalam folder operation
 
@@ -329,7 +329,6 @@ service bind9 restart
 
 Pada `Berlint`
 
-**Water7 /etc/bind/named.conf.local**
 ```echo 'options {
         directory "/var/cache/bind";
 
@@ -386,7 +385,7 @@ Pada `Berlint`
 Pada `SSS`
 ![gambar 5 2](https://user-images.githubusercontent.com/81162174/198837356-ebc614c6-12cb-41c6-ad25-d58499674b6d.PNG)
 
-## 7
+## Soal 7
 
 > Untuk informasi yang lebih spesifik mengenai Operation Strix, buatlah subdomain melalui Berlint dengan akses strix.operation.wise.yyy.com dengan alias www.strix.operation.wise.yyy.com yang mengarah ke Eden.
 
@@ -418,8 +417,9 @@ Pada `SSS`
 ```
 ping strix.operation.wise.E04.com -c 5
 ```
-
+Pada `Berlint`
 ![gamber 71](https://user-images.githubusercontent.com/81162174/198837565-e3076624-8b4b-4e26-a09e-bffea1c96fe0.PNG)
+Pada `SSS`
 ![gambar 72](https://user-images.githubusercontent.com/81162174/198837570-78a2bb65-22f0-462c-a7f2-10441f56e8b1.PNG)
 
 ## Soal 8
