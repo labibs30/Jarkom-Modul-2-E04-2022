@@ -114,7 +114,7 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 ## Soal 8
 
 > Diperlukan konfigurasi Webserver `www.wise.E04.com` dengan DocumentRoot pada `/var/www/wise.E04.com`. Untuk itu dilakukan command seperti berikut:
-1. `Wise`
+1. Di node `Wise`
 ```
 cp /etc/bind/wise/3.194.192.in-addr.arpa /etc/bind/wise/2.194.192.in-addr.arpa
 
@@ -167,7 +167,7 @@ operation       IN      NS      ns1
 
 service bind9 restart
 ```
-2. `Eden`
+2. Di node `Eden`
 ```
 apt-get update
 
@@ -212,7 +212,7 @@ service apache2 restart
 service apache2 reload
 ```
 
-3. `SSS`
+3. Di node `SSS`
 ```
 apt-get update
 
@@ -225,7 +225,7 @@ Maka akan muncul seperti ini:
 
 ## Soal 9
 > Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`. Untuk itu dilakukan command seperti berikut:
-1. `Eden`
+1. Di node `Eden`
 ```
 a2enmod rewrite
 
@@ -257,7 +257,7 @@ echo "
 
 service apache2 restart
 ```
-2. `SSS`
+2. Di node `SSS`
 ```
 lynx www.wise.E04.com/home
 ```
@@ -265,7 +265,7 @@ Maka akan muncul seperti ini:
 
 ## Soal 10
 > Setelah itu, pada subdomain `www.eden.wise.E04.com`, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada `/var/www/eden.wise.E04.com`. Untuk itu dilakukan command seperti berikut:
-1. `Eden`
+1. Di node `Eden`
 ```
 cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/eden.wise.E04.com.conf
 
@@ -295,8 +295,41 @@ service apache2 restart
 
 service apache2 reload
 ```
-2. `SSS`
+2. Di node `SSS`
 ```
-www.eden.wise.E04.com
+lynx www.eden.wise.E04.com
+```
+Maka akan muncul seperti ini:
+
+## Soal 11
+> Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja. Untuk itu dilakukan command seperti berikut:
+1. Di node `Eden`
+```
+echo "
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.E04.com
+        ServerName eden.wise.E04.com
+        ServerAlias www.eden.wise.E04.com
+
+        <Directory /var/www/eden.wise.E04.com/public>
+                Options +Indexes
+        </Directory>
+
+        <Directory /var/www/eden.wise.E04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+service apache2 restart
+```
+2. Di node `SSS`
+```
+lynx www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
