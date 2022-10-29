@@ -383,6 +383,7 @@ Pada `Wise`
 Pada `Berlint`
 ![gambar 63](https://user-images.githubusercontent.com/81162174/198837649-ce4902ba-9b08-41e1-8f3a-0d18659d8836.PNG)
 Pada `SSS`
+
 ![gambar 5 2](https://user-images.githubusercontent.com/81162174/198837356-ebc614c6-12cb-41c6-ad25-d58499674b6d.PNG)
 
 ## Soal 7
