@@ -342,3 +342,5 @@ service apache2 restart
 lynx www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
+</br></br>
+<img width="546" alt="image" src="https://user-images.githubusercontent.com/87472849/198836219-9f682e15-471f-42fa-a0ea-ffce8510fb0f.png">
