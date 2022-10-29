@@ -344,3 +344,8 @@ lynx www.eden.wise.E04.com
 Maka akan muncul seperti ini:
 </br></br>
 <img width="546" alt="image" src="https://user-images.githubusercontent.com/87472849/198836219-9f682e15-471f-42fa-a0ea-ffce8510fb0f.png">
+
+### Kendala
+
+1. Ketika install lynx kendalanya adalah terkadang mengalami error ketika download atau terdownload namun sangat lama.
+2. Terkadang project tiba-tiba connection lost sehingga run project mengulang dari awal
