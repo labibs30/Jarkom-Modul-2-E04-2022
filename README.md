@@ -306,6 +306,9 @@ service apache2 reload
 lynx www.eden.wise.E04.com
 ```
 Maka akan muncul seperti ini:
+</br></br>
+<img width="545" alt="image" src="https://user-images.githubusercontent.com/87472849/198836067-c694cb10-cfae-47f9-b81b-04f58ef2a7aa.png">
+
 
 ## Soal 11
 > Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja. Untuk itu dilakukan command seperti berikut:
