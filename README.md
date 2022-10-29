@@ -222,6 +222,9 @@ lynx wise.E04.com
 
 ```
 Maka akan muncul seperti ini:
+</br></br>
+<img width="528" alt="image" src="https://user-images.githubusercontent.com/87472849/198835758-c57234e0-fe90-4c93-8c41-99c0101c3496.png">
+
 
 ## Soal 9
 > Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`. Untuk itu dilakukan command seperti berikut:
