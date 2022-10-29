@@ -60,7 +60,43 @@ iface eth0 inet static
 	netmask 255.255.255.0
 	gateway 192.194.3.1
 ```
+`SSS`
 
+```shell
+auto eth0
+iface eth0 inet static
+	address 192.194.1.2
+	netmask 255.255.255.0
+	gateway 192.194.1.1
+```
+`Garden`
+
+```shell
+auto eth0
+iface eth0 inet static
+	address 192.194.1.3
+	netmask 255.255.255.0
+	gateway 192.194.1.1
+```
+`Berlint`
+```shell
+auto eth0
+iface eth0 inet static
+	address 192.194.2.2
+	netmask 255.255.255.0
+	gateway 192.194.2.1
+```
+
+`Eden`
+```shell
+auto eth0
+iface eth0 inet static
+	address 192.194.2.3
+	netmask 255.255.255.0
+	gateway 192.194.2.1
+```
+
+Kemudian, meletakkan `iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.194.0.0/16` pada `/root/.bashrc` pada **Ostania**. Terakhir, tambahkan `echo nameserver 192.168.122.1` untuk setiap node pada `/root/.bashrc`.
 
 ## 2
 > Membuat webiste utama dengan menggunakan `wise.E04.com` dengan alias `www.wise.E04.com` pada folder wise. Untuk melakukan hal tersebut, digunakan perintah seperti berikut : 
@@ -112,90 +148,134 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 ![image](https://user-images.githubusercontent.com/96496752/198818465-cfe5d52e-2736-4832-a18f-a849205bdcc1.png)
 
 ## 3
+> Membuat subdomain `eden.wise.yyy.com` dengan alias `www.eden.wise.yyy.com` yang diatur DNS-nya di **WISE** dan mengarah ke **Eden**
 
-> Setelah itu buat subdomain super.franky.yyy.com dengan alias www.super.franky.yyy.com yang diatur DNS nya di EniesLobby dan mengarah ke Skypie.
+Pada `WISE` kita cukup menambahkan `eden`
 
-Pada franky kita cukup menambahkan super.
-
-**EniesLobby modul1/franky.e01.com**
 ```shell
-;
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                     2021100401         ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.2
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-```
-Kemudian menjalankan `ping super.franky.e01.com` dan `ping www.super.franky.e01.com` pada 2 line paling bawah. Hasilnya sebagai berikut.
+@       IN      NS      wise.E04.com.
+@       IN      A       192.194.3.2     ; IP Wise
+www     IN      CNAME   wise.E04.com.
+eden    IN      A       192.194.2.3
+www.eden     IN      CNAME   eden.wise.E04.com.
+@       IN      AAAA    ::1' > /etc/bind/wise/wise.E04.com
 
-![soal3](https://user-images.githubusercontent.com/65794806/139520648-e5e6b609-2937-43e9-831e-c7785aaa0d67.png)
+service bind9 restart
+```
+Selanjutnya, menjalankan `ping eden.wise.yyy.com` dan `ping www.eden.wise.yyy.com` kita batasi untuk 5 ping menggunakan `-c 5`. Berikut hasilnya : 
+
+![image](https://user-images.githubusercontent.com/96496752/198831311-848bc2b9-0fb1-4f3d-9205-2a8e60659f65.png)
 
 ## 4
 
-> Buat juga reverse domain untuk domain utama.
+> Membuat juga reverse domain untuk domain utama.
 
-Karena pada nomor 2 telah dideclare di named.conf.local, maka tinggal menambahkan config addr arpanya.
+Kita tambahkan konfigurasi **in-addr.arpa** pada file ` named.conf.local`, seperti berikut
+Pada `WISE`
 
-**EniesLobby modul1/2.200.192.in-addr.arpa**
 ```shell
-;
+echo 'zone "wise.E04.com" {
+        type master;
+        file "/etc/bind/wise/wise.E04.com";
+};
+
+zone "3.194.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/wise/3.194.192.in-addr.arpa";
+};' > /etc/bind/named.conf.local
+
+cp /etc/bind/db.local /etc/bind/wise/3.194.192.in-addr.arpa
+
+echo ';
 ; BIND data file for local loopback interface
 ;
-$TTL	604800
-@	IN	SOA	franky.e01.com. root.franky.e01.com. (
-			2021100401	; Serial
-			 604800		; Refresh
-			  86400		; Retry
-			2419200		; Expire
-			 604800 )	; Negative Cache TTL
+$TTL    604800
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
 ;
-2.200.192.in-addr.arpa. IN	NS	franky.e01.com.
-2 			IN	PTR	franky.e01.com.
+3.194.192.in-addr.arpa.    IN      NS      wise.E04.com.
+2                IN      PTR     wise.E04.com.' > /etc/bind/wise/3.194.192.in-addr.arpa
 
+service bind9 restart
 ```
-`cp modul1/2.200.192.in-addr.arpa /etc/bind/kaizoku/2.200.192.in-addr.arpa`
+pada `SSS`
+```shell
+echo nameserver 192.168.122.1 > /etc/resolv.conf
 
-Cek: `host -t PTR 192.200.2.2`
+apt-get update
+apt-get install dnsutils
 
-![soal4](https://user-images.githubusercontent.com/65794806/139520789-af2d3fd3-6382-4c72-b9e6-193fa285b511.png)
+echo nameserver 192.194.3.2 > /etc/resolv.conf
+
+host -t PTR 192.194.3.2
+```
+Untuk test bisa menggunakan `host -t PTR 192.194.3.2` pada client, berikut hasil yang diperoleh : 
+
+![image](https://user-images.githubusercontent.com/96496752/198832131-c8ed524d-e44e-4c09-9cdf-a8442a7bd245.png)
 
 ## 5
 
-> Supaya tetap bisa menghubungi Franky jika server EniesLobby rusak, maka buat Water7 sebagai DNS Slave untuk domain utama.
+> Agar dapat tetap dihubungi jika server WISE bermasalah, buatlah juga Berlint sebagai DNS Slave untuk domain utama
 
-Menambahkan Notify
-
-**EniesLobby /etc/bind/named.conf.local**
+pada `WISE`
 ```shell
-zone "franky.e01.com" {
-    type master;
-    file "/etc/bind/kaizoku/franky.e01.com";
-    allow-transfer { 192.200.2.3; }; // Masukan IP Water7 tanpa tanda petik
-    // bikin jadi slave
-    also-notify { 192.200.2.3; };
-    notify yes;
+echo 'zone "wise.E04.com" {
+        type master;
+      notify yes;
+          also-notify { 192.194.2.2; }; // Masukan IP Berlint tanpa tanda petik
+        allow-transfer { 192.194.2.2; }; // Masukan IP Berlint tanpa tanda petik
+        file "/etc/bind/wise/wise.E04.com";
 };
 
-zone "2.200.192.in-addr.arpa" {
+zone "3.194.192.in-addr.arpa" {
     type master;
-    file "/etc/bind/kaizoku/2.200.192.in-addr.arpa";
-};
+    file "/etc/bind/wise/3.194.192.in-addr.arpa";
+};' > /etc/bind/named.conf.local
+
+service bind9 restart
 ```
-Menyalakan notify
+pada `Berlint`
+```shell
+apt-get update
 
-![soal5 1](https://user-images.githubusercontent.com/65794806/139520902-586295cf-99a4-4017-a2eb-6f0a738a8622.png)
+apt-get install bind9 -y
 
-![soal5 2](https://user-images.githubusercontent.com/65794806/139520904-b9f09b19-3345-4402-a955-2d6446a65c04.png)
+echo 'zone "wise.E04.com" {
+    type slave;
+    masters { 192.194.3.2; }; // Masukan IP Wise tanpa tanda petik
+    file "/var/lib/bind/wise.E04.com";
+};' > /etc/bind/named.conf.local
+
+service bind9 restart
+```
+`WISE` untuk test nomor 5
+```shell
+service bind9 stop
+```
+`SSS ` untuk test nomor 5
+```shell
+echo 'nameserver 192.194.3.2
+nameserver 192.194.2.2' > /etc/resolv.conf
+
+ping wise.E04.com -c 5
+```
+Setelah dijalankan, maka akan diperoleh : 
+![image](https://user-images.githubusercontent.com/96496752/198834430-b953cd61-0fec-44ef-a9d2-ebb087606253.png)
 
 ## 6
 
