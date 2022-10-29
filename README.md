@@ -111,9 +111,9 @@ Untuk melakukan pengecekan apakah konfigurasi yang telah dibuat berhasil, maka k
 
 ![image](https://user-images.githubusercontent.com/96496752/198818465-cfe5d52e-2736-4832-a18f-a849205bdcc1.png)
 
-## 8
+## Soal 8
 
-> Diperlukan konfigurasi Webserver www.wise.yyy.com dengan DocumentRoot pada /var/www/wise.yyy.com. Untuk itu dilakukan command seperti berikut:
+> Diperlukan konfigurasi Webserver `www.wise.E04.com` dengan DocumentRoot pada `/var/www/wise.E04.com`. Untuk itu dilakukan command seperti berikut:
 1. `Wise`
 ```
 cp /etc/bind/wise/3.194.192.in-addr.arpa /etc/bind/wise/2.194.192.in-addr.arpa
@@ -221,3 +221,44 @@ apt-get install lynx
 lynx wise.E04.com
 
 ```
+Maka akan muncul seperti ini:
+
+## Soal 9
+> Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`
+1. `Eden`
+```
+a2enmod rewrite
+
+service apache2 restart
+
+echo "
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) /index.php/\$1 [L]
+" >/var/www/wise.E04.com/.htaccess
+
+echo "
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/wise.E04.com
+        ServerName wise.E04.com
+        ServerAlias www.wise.E04.com
+
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.E04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/wise.E04.com.conf
+
+service apache2 restart
+```
+2. `SSS`
+```
+lynx www.wise.E04.com/home
+```
+Maka akan muncul seperti ini:
