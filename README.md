@@ -377,168 +377,242 @@ www.general IN  CNAME   general.mecha.franky.e01.com.
 
 ![soal7](https://user-images.githubusercontent.com/65794806/139521280-b16ba373-2efb-4c3e-ac08-8f05f8d9594a.png)
 
-## 8
+## Soal 8
 
-> Setelah melakukan konfigurasi server, maka dilakukan konfigurasi Webserver. Pertama dengan webserver www.franky.yyy.com. Pertama, luffy membutuhkan webserver dengan DocumentRoot pada /var/www/franky.yyy.com
+> Diperlukan konfigurasi Webserver `www.wise.E04.com` dengan DocumentRoot pada `/var/www/wise.E04.com`. Untuk itu dilakukan command seperti berikut:
+1. Di node `Wise`
+```
+cp /etc/bind/wise/3.194.192.in-addr.arpa /etc/bind/wise/2.194.192.in-addr.arpa
 
-Karena menggunakan web server, maka Config EniesLobby terlebih dahulu diarahkan ke Skypie.
-
-**EniesLobby modul1/webserver/franky.e01.com**
-```shell
-;
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                        4               ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-@       IN      NS      franky.e01.com.
-@       IN      A       192.200.2.4
-www     IN      CNAME   franky.e01.com.
-super   IN      A       192.200.2.4
-www.super IN    CNAME   super.franky.e01.com.
-mecha   IN      NS      ns1
-```
+2.194.192.in-addr.arpa.       IN      NS      wise.E04.com.
+3       IN      PTR      wise.E04.com.' > /etc/bind/wise/2.194.192.in-addr.arpa
 
-**EniesLobby modul1/webserver/2.200.192.in-addr-arpa**
-```shell
-;
+
+echo 'zone "wise.E04.com" {
+    type master;
+    file "/etc/bind/wise/wise.E04.com";
+    allow-transfer { 192.194.2.2; }; // Masukan IP Berlint tanpa tanda petik
+};
+
+zone "2.194.192.in-addr.arpa" {
+    type master;
+    file "/etc/bind/wise/2.194.192.in-addr.arpa";
+};
+' > /etc/bind/named.conf.local
+
+echo ';
 ; BIND data file for local loopback interface
 ;
 $TTL    604800
-@       IN      SOA     franky.e01.com. root.franky.e01.com. (
-                        2               ; Serial
+@       IN      SOA     wise.E04.com. root.wise.E04.com. (
+                     2022102401         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                          604800 )       ; Negative Cache TTL
 ;
-2.200.192.in-addr.arpa. IN      NS      franky.e01.com.
-2                       IN      PTR     franky.e01.com.
+@       IN      NS      wise.E04.com.
+@       IN      A       192.194.2.3
+www     IN      CNAME   wise.E04.com.
+eden    IN      A       192.194.2.3
+www.eden        IN      CNAME   eden.wise.E04.com.
+ns1     IN      A       192.194.2.3
+operation       IN      NS      ns1
+@       IN      AAAA    ::1' > /etc/bind/wise/wise.E04.com
+
+service bind9 restart
 ```
-
-Install apache2 & php di water7 dan memasukkan dokumen htmlnya.
-
-**Skypie modul1/franky.e01.com**
-```bash
-<VirtualHost *:80>
-  ...
-	ServerName franky.e01.com
-  ServerAlias www.franky.e01.com
-
-	ServerAdmin webmaster@localhost
-	DocumentRoot /var/www/franky.e01.com
-  
-  ...
-
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-  ...
-</VirtualHost>
-
+2. Di node `Eden`
 ```
-`lynx http://www.franky.e01.com`
+apt-get update
 
-![soal8](https://user-images.githubusercontent.com/65794806/139521462-0b028254-894d-4d1b-9735-a03bf5e30126.png)
+apt-get install apache2
 
-## 9
+service apache2 start
 
-> Setelah itu, Luffy juga membutuhkan agar url www.franky.yyy.com/index.php/home dapat menjadi menjadi www.franky.yyy.com/home.
+apt-get install php
 
-Membuat alias dari home yang akan mengarah ke index.php/home
+apt-get install libapache2-mod-php7.0
 
-**Skypie modul1/franky.e01.com**
-```bash
+apt-get install wget -y
+
+apt-get install unzip -y
+
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/wise.E04.com.conf
+
+echo '
 <VirtualHost *:80>
-        ...
-        ServerName franky.e01.com
-        ServerAlias www.franky.e01.com
-
         ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/franky.e01.com
-
-        Alias "/home" "/var/www/franky.e01.com/index.php/home"
-
-        ...
+        DocumentRoot /var/www/wise.E04.com
+        ServerName wise.E04.com
+        ServerAlias www.wise.E04.com
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
         CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-        ...
 </VirtualHost>
+' > /etc/apache2/sites-available/wise.E04.com.conf
+
+mkdir /var/www/wise.E04.com
+
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1S0XhL9ViYN7TyCj2W66BNEXQD2AAAw2e' -O /var/www/wise.zip
+
+unzip /var/www/wise.zip -d /var/www
+
+cp /var/www/wise/* /var/www/wise.E04.com
+
+a2ensite wise.E04.com
+
+service apache2 restart
+
+service apache2 reload
+```
+
+3. Di node `SSS`
+```
+apt-get update
+
+apt-get install lynx
+
+lynx wise.E04.com
 
 ```
-`lynx http://franky.e01.com/home`
+Maka akan muncul seperti ini:
+</br></br>
+<img width="528" alt="image" src="https://user-images.githubusercontent.com/87472849/198835758-c57234e0-fe90-4c93-8c41-99c0101c3496.png">
 
-![soal9](https://user-images.githubusercontent.com/65794806/139521813-929fd2fe-c606-4c3c-84ad-8fbd43353eb9.png)
 
-## 10
+## Soal 9
+> Setelah itu, Loid juga membutuhkan agar url `www.wise.E04.com/index.php/home` dapat menjadi menjadi `www.wise.E04.com/home`. Untuk itu dilakukan command seperti berikut:
+1. Di node `Eden`
+```
+a2enmod rewrite
 
-> Setelah itu, pada subdomain www.super.franky.yyy.com, Luffy membutuhkan penyimpanan aset yang memiliki DocumentRoot pada /var/www/super.franky.yyy.com.
+service apache2 restart
 
-**Skypie /etc/apache2/sites-available/super.franky.e01.com.conf**
-```bash
+echo "
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule (.*) /index.php/\$1 [L]
+" >/var/www/wise.E04.com/.htaccess
+
+echo "
 <VirtualHost *:80>
-        ...
-        ServerName super.franky.e01.com
-        ServerAlias www.super.franky.e01.com
-
         ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/super.franky.e01.com
+        DocumentRoot /var/www/wise.E04.com
+        ServerName wise.E04.com
+        ServerAlias www.wise.E04.com
 
-        ...
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
+
+        <Directory /var/www/wise.E04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
+        </Directory>
+</VirtualHost>
+" > /etc/apache2/sites-available/wise.E04.com.conf
+
+service apache2 restart
+```
+2. Di node `SSS`
+```
+lynx www.wise.E04.com/home
+```
+Maka akan muncul seperti ini:
+</br></br>
+<img width="516" alt="image" src="https://user-images.githubusercontent.com/87472849/198835937-dd3337bc-92ea-4ca8-b6eb-4f97859e4f4b.png">
+
+
+## Soal 10
+> Setelah itu, pada subdomain `www.eden.wise.E04.com`, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada `/var/www/eden.wise.E04.com`. Untuk itu dilakukan command seperti berikut:
+1. Di node `Eden`
+```
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+echo '
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/eden.wise.E04.com
+        ServerName eden.wise.E04.com
+        ServerAlias www.eden.wise.E04.com
 
         ErrorLog ${APACHE_LOG_DIR}/error.log
         CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-        ...
 </VirtualHost>
+' > /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+mkdir /var/www/eden.wise.E04.com
+
+wget --no-check-certificate 'https://docs.google.com/uc?export=download&id=1q9g6nM85bW5T9f5yoyXtDqonUKKCHOTV' -O /var/www/eden.wise.zip
+
+unzip /var/www/eden.wise.zip -d /var/www
+
+cp /var/www/eden.wise/* /var/www/eden.wise.E04.com
+
+a2ensite eden.wise.E04.com
+
+service apache2 restart
+
+service apache2 reload
 ```
+2. Di node `SSS`
+```
+lynx www.eden.wise.E04.com
+```
+Maka akan muncul seperti ini:
+</br></br>
+<img width="545" alt="image" src="https://user-images.githubusercontent.com/87472849/198836067-c694cb10-cfae-47f9-b81b-04f58ef2a7aa.png">
 
-cek lynx ke super.franky.e01.com
-`lynx http://www.super.franky.e01.com`
 
-![soal10](https://user-images.githubusercontent.com/65794806/139521940-61d24205-55e8-401f-983c-950d0b4161ae.png)
-
-Bentuknya berupa directory listing karena tidak ada default htmlnya.
-
-## 11
-
-> Akan tetapi, pada folder /public, Luffy ingin hanya dapat melakukan directory listing saja.
-
-Selanjutnya merupakan directory listing untuk public, dengan menambah directory dan option +indexes.
-
-**Skypie super.franky.e01.com.conf**
-```bash
+## Soal 11
+> Akan tetapi, pada folder /public, Loid ingin hanya dapat melakukan directory listing saja. Untuk itu dilakukan command seperti berikut:
+1. Di node `Eden`
+```
+echo "
 <VirtualHost *:80>
-        ServerName super.franky.e01.com
-        ServerAlias www.super.franky.e01.com
-
         ServerAdmin webmaster@localhost
-        DocumentRoot /var/www/super.franky.e01.com
+        DocumentRoot /var/www/eden.wise.E04.com
+        ServerName eden.wise.E04.com
+        ServerAlias www.eden.wise.E04.com
 
-	<Directory /var/www/super.franky.e01.com>
+        <Directory /var/www/eden.wise.E04.com/public>
                 Options +Indexes
         </Directory>
 
-	<Directory /var/www/super.franky.e01.com/error>
-                Options -Indexes
+        <Directory /var/www/eden.wise.E04.com>
+                Options +FollowSymLinks -Multiviews
+                AllowOverride All
         </Directory>
 
-        <Directory /var/www/super.franky.e01.com/public>
-                Options +Indexes
-        </Directory>
-
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
+        ErrorLog \${APACHE_LOG_DIR}/error.log
+        CustomLog \${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
+" > /etc/apache2/sites-available/eden.wise.E04.com.conf
+
+service apache2 restart
 ```
+2. Di node `SSS`
+```
+lynx www.eden.wise.E04.com
+```
+Maka akan muncul seperti ini:
+</br></br>
+<img width="546" alt="image" src="https://user-images.githubusercontent.com/87472849/198836219-9f682e15-471f-42fa-a0ea-ffce8510fb0f.png">
 
-error dimatikan indexnya karena yang dibutuhkan pada public
+### Kendala
 
-`lynx http://www.super.franky.e01.com/public`
+1. Ketika install lynx kendalanya adalah terkadang mengalami error ketika download atau terdownload namun sangat lama.
+2. Terkadang project tiba-tiba connection lost sehingga run project mengulang dari awal
 
