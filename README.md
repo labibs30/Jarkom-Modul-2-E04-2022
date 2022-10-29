@@ -265,6 +265,9 @@ service apache2 restart
 lynx www.wise.E04.com/home
 ```
 Maka akan muncul seperti ini:
+</br></br>
+<img width="516" alt="image" src="https://user-images.githubusercontent.com/87472849/198835937-dd3337bc-92ea-4ca8-b6eb-4f97859e4f4b.png">
+
 
 ## Soal 10
 > Setelah itu, pada subdomain `www.eden.wise.E04.com`, Loid membutuhkan penyimpanan aset yang memiliki DocumentRoot pada `/var/www/eden.wise.E04.com`. Untuk itu dilakukan command seperti berikut:
